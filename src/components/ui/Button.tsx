@@ -5,19 +5,19 @@ type Size = 'sm' | 'md' | 'lg'
 
 const variantClass: Record<Variant, string> = {
   primary:
-    'bg-[#1B5E20] text-white hover:bg-[#166534] active:bg-[#14532D] shadow-sm hover:shadow',
+    'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 shadow-sm',
   secondary:
-    'bg-white text-[#374151] border border-[#E5E7EB] hover:bg-[#F9FAFB]',
+    'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50',
   danger:
-    'bg-white text-[#DC2626] border-[1.5px] border-[#DC2626] hover:bg-[#FEF2F2]',
+    'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100',
   ghost:
-    'bg-transparent text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#374151]',
+    'bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-700',
 }
 
 const sizeClass: Record<Size, string> = {
-  sm: 'h-9 px-4 text-[13px] rounded-lg',
-  md: 'h-11 px-5 text-sm rounded-[10px]',
-  lg: 'h-12 px-6 text-sm rounded-[10px]',
+  sm: 'h-9 px-4 text-[13px] rounded-xl',
+  md: 'h-10 px-4 text-sm rounded-xl',
+  lg: 'h-11 px-5 text-sm rounded-xl',
 }
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -40,7 +40,7 @@ export function Button({
   return (
     <button
       type="button"
-      className={`inline-flex items-center justify-center gap-2 font-semibold transition-all duration-150 ease-out disabled:opacity-50 disabled:pointer-events-none ${variantClass[variant]} ${sizeClass[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 font-medium transition-all duration-150 ease-out active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none ${variantClass[variant]} ${sizeClass[size]} ${className}`}
       disabled={disabled || loading}
       {...rest}
     >

@@ -6,22 +6,20 @@
     'Pretendard Variable', Pretendard, system-ui, -apple-system, BlinkMacSystemFont,
     sans-serif;
 
-  --color-gc-primary: #1b5e20;
-  --color-gc-primary-light: #2e7d32;
-  --color-gc-accent: #4caf50;
-  --color-gc-bg: #f7f8f7;
+  /* Refreshed palette — emerald + slate */
+  --color-gc-primary: #166534;
+  --color-gc-primary-light: #15803d;
+  --color-gc-accent: #22c55e;
+  --color-gc-bg: #f8fafc;
   --color-gc-surface: #ffffff;
-  --color-gc-border: #eeeeee;
-  --color-gc-text: #111827;
-  --color-gc-text-secondary: #6b7280;
-  --color-gc-text-hint: #9ca3af;
+  --color-gc-border: #e2e8f0;
+  --color-gc-text: #0f172a;
+  --color-gc-text-secondary: #64748b;
+  --color-gc-text-hint: #94a3b8;
 
-  --shadow-gc-card:
-    0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-gc-elevated:
-    0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-gc-modal:
-    0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-gc-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-gc-elevated: 0 4px 6px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-gc-modal: 0 20px 25px rgba(0, 0, 0, 0.08), 0 10px 10px rgba(0, 0, 0, 0.04);
 }
 
 @layer base {
@@ -48,7 +46,7 @@
   }
 }
 
-/* react-hot-toast custom */
+/* react-hot-toast */
 .gc-toast-success {
   background: #f0fdf4 !important;
   color: #166534 !important;
@@ -56,6 +54,7 @@
   font-size: 14px !important;
   font-weight: 500 !important;
   box-shadow: var(--shadow-gc-card) !important;
+  border-radius: 12px !important;
 }
 
 .gc-toast-error {
@@ -63,6 +62,7 @@
   color: #dc2626 !important;
   border: 1px solid #fecaca !important;
   font-size: 14px !important;
+  border-radius: 12px !important;
 }
 
 .gc-toast-info {
@@ -70,17 +70,34 @@
   color: #1d4ed8 !important;
   border: 1px solid #bfdbfe !important;
   font-size: 14px !important;
+  border-radius: 12px !important;
 }
 
 .page-enter {
-  animation: gcFadeIn 0.2s ease forwards;
+  animation: gcFadeIn 0.18s ease forwards;
 }
 
 @keyframes gcFadeIn {
   from {
     opacity: 0;
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
+}
+
+/* Leaflet: clean white tooltip for permanent worker labels */
+.leaflet-tooltip-worker {
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  padding: 4px 8px !important;
+  font-family: var(--font-sans) !important;
+  pointer-events: none !important;
+}
+.leaflet-tooltip-worker::before {
+  border-bottom-color: #e2e8f0 !important;
 }

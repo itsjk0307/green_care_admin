@@ -19,7 +19,7 @@ export function Card({
 }: Props) {
   return (
     <div
-      className={`rounded-2xl border border-[#EEEEEE] bg-white shadow-[var(--shadow-gc-card)] transition-all duration-150 ease-out ${pad[padding]} ${className}`}
+      className={`rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-200 ease-out ${pad[padding]} ${className}`}
       {...rest}
     >
       {children}
