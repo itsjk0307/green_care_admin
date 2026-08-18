@@ -8,6 +8,8 @@ import {
   uploadDroneScan,
 } from '../../services/droneScanService'
 import { formatFileSize, todayLocalDate } from '../../lib/formatScanDate'
+import { courseDisplayName } from '../../lib/courseName'
+import { useLanguageStore } from '../../stores/languageStore'
 import { Button } from '../ui/Button'
 import { LoadingSpinner } from '../ui/LoadingSpinner'
 import { Modal } from '../ui/Modal'
@@ -34,6 +36,7 @@ export function UploadScanModal({
   defaultCourseId,
   onSuccess,
 }: Props) {
+  const { language } = useLanguageStore()
   const queryClient = useQueryClient()
   const [courseId, setCourseId] = useState(defaultCourseId ?? '')
   const [scanDate, setScanDate] = useState(todayLocalDate())
@@ -183,7 +186,7 @@ export function UploadScanModal({
               <option value="">선택하세요</option>
               {courses.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.name_ko || c.name}
+                  {courseDisplayName(c, language)}
                 </option>
               ))}
             </select>

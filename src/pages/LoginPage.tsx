@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
+import {
+  LoginPendingError,
+  LoginRejectedError,
+} from '../api/auth'
 import { useAuth } from '../context/AuthContext'
 import { API_BASE_URL } from '../config'
 import { devCheckApiHealth, devTerminalLog } from '../lib/devLog'
+import { useLanguageStore } from '../stores/languageStore'
 
 const FEATURES = [
   '실시간 현장 작업 모니터링',
@@ -16,9 +21,13 @@ const FEATURES = [
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const { t } = useLanguageStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [errorKind, setErrorKind] = useState<'generic' | 'pending' | 'rejected'>(
+    'generic',
+  )
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -29,6 +38,7 @@ export function LoginPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setErrorKind('generic')
     if (!email.trim() || !password) {
       setError('이메일과 비밀번호를 입력하세요.')
       return
@@ -39,6 +49,16 @@ export function LoginPage() {
       toast.success('로그인되었습니다.', { className: 'gc-toast-success' })
       navigate('/', { replace: true })
     } catch (err) {
+      if (err instanceof LoginPendingError) {
+        setErrorKind('pending')
+        setError(err.message)
+        return
+      }
+      if (err instanceof LoginRejectedError) {
+        setErrorKind('rejected')
+        setError(err.message)
+        return
+      }
       const message =
         err instanceof Error
           ? err.message
@@ -53,19 +73,21 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* ── Left branding panel ── */}
-      <div className="relative hidden lg:flex lg:w-[460px] xl:w-[520px] flex-col justify-between overflow-hidden bg-gradient-to-br from-[#052e16] via-[#166534] to-[#15803d] p-12">
+      <div className="relative hidden lg:flex lg:w-[460px] xl:w-[520px] flex-col justify-between overflow-hidden bg-sidebar p-12">
         {/* Subtle background circles */}
         <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/5" />
         <div className="pointer-events-none absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-white/5" />
 
         {/* Logo */}
         <div className="relative flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-[20px] backdrop-blur-sm">
-            ⛳
-          </div>
+          <img
+            src="/logo.png"
+            alt="대정골프"
+            className="h-10 w-10 shrink-0 rounded-xl object-cover object-left"
+          />
           <div>
             <p className="text-[18px] font-bold tracking-tight text-white">GreenCare</p>
-            <p className="text-[11px] font-medium text-emerald-300">대중골프엔지니어링</p>
+            <p className="text-[11px] font-medium text-gray-400">대중골프엔지니어링</p>
           </div>
         </div>
 
@@ -74,22 +96,22 @@ export function LoginPage() {
           <h2 className="text-[40px] font-bold leading-[1.18] tracking-tight text-white">
             스마트 골프장<br />관리 시스템
           </h2>
-          <p className="mt-4 text-[17px] leading-relaxed text-emerald-200">
+          <p className="mt-4 text-[17px] leading-relaxed text-gray-300">
             현장과 데이터를 한곳에서.<br />더 빠르고 정확한 관리를 시작하세요.
           </p>
 
           <ul className="mt-8 space-y-3">
             {FEATURES.map((f) => (
               <li key={f} className="flex items-center gap-3">
-                <CheckCircleIcon className="h-5 w-5 shrink-0 text-emerald-400" />
-                <span className="text-[14px] text-emerald-100">{f}</span>
+                <CheckCircleIcon className="h-5 w-5 shrink-0 text-brand-light" />
+                <span className="text-[14px] text-gray-300">{f}</span>
               </li>
             ))}
           </ul>
         </div>
 
         {/* Footer */}
-        <p className="relative text-[12px] text-emerald-600">
+        <p className="relative text-[12px] text-gray-500">
           © {new Date().getFullYear()} GreenCare · 대중골프엔지니어링
         </p>
       </div>
@@ -99,7 +121,11 @@ export function LoginPage() {
         <div className="w-full max-w-[400px]">
           {/* Mobile-only logo */}
           <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-            <span className="text-2xl" aria-hidden>⛳</span>
+            <img
+              src="/logo.png"
+              alt="대정골프"
+              className="h-8 w-8 shrink-0 rounded-lg object-cover object-left"
+            />
             <span className="text-xl font-bold text-slate-900">GreenCare</span>
           </div>
 
@@ -119,7 +145,7 @@ export function LoginPage() {
                   autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-150 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-150 focus:border-brand focus:ring-2 focus:ring-brand/20"
                   placeholder="admin@greencare.com"
                 />
               </div>
@@ -133,7 +159,7 @@ export function LoginPage() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-150 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-150 focus:border-brand focus:ring-2 focus:ring-brand/20"
                   placeholder="••••••••"
                 />
               </div>
@@ -141,7 +167,13 @@ export function LoginPage() {
               {error ? (
                 <div
                   role="alert"
-                  className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+                  className={`rounded-xl border px-4 py-3 text-sm ${
+                    errorKind === 'pending'
+                      ? 'border-amber-200 bg-amber-50 text-amber-800'
+                      : errorKind === 'rejected'
+                        ? 'border-red-200 bg-red-50 text-red-600'
+                        : 'border-red-200 bg-red-50 text-red-600'
+                  }`}
                 >
                   {error}
                 </div>
@@ -150,7 +182,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-all duration-150 hover:bg-emerald-700 active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
+                className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand text-sm font-semibold text-white transition-all duration-150 hover:bg-brand-light active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
               >
                 {loading ? (
                   <>
@@ -162,6 +194,13 @@ export function LoginPage() {
                 )}
               </button>
             </form>
+
+            <p className="mt-6 text-center text-sm text-slate-500">
+              {t('loginCreateAccount')}{' '}
+              <Link to="/signup" className="font-semibold text-brand hover:underline">
+                {t('signupLink')}
+              </Link>
+            </p>
           </div>
         </div>
       </div>

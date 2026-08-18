@@ -10,10 +10,10 @@ export type BadgeVariant =
 
 const styles: Record<BadgeVariant, string> = {
   pending: 'bg-amber-100 text-amber-700',
-  approved: 'bg-emerald-100 text-emerald-700',
+  approved: 'bg-[#eef0f2] text-[#121820]',
   rejected: 'bg-red-100 text-red-700',
   disease: 'bg-orange-100 text-orange-700',
-  healthy: 'bg-emerald-100 text-emerald-700',
+  healthy: 'bg-[#eef0f2] text-[#121820]',
   info: 'bg-blue-100 text-blue-700',
 }
 

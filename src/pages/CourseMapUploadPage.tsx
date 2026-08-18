@@ -10,6 +10,8 @@ import { apiOrigin } from '../config'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
+import { courseDisplayName } from '../lib/courseName'
+import { useLanguageStore } from '../stores/languageStore'
 import type { GolfCourse } from '../types/api'
 
 const MAX_SIZE = 10 * 1024 * 1024
@@ -24,6 +26,7 @@ function buildUploadedMapUrl(mapUrl: string, bust: number): string {
 }
 
 export function CourseMapUploadPage() {
+  const { language } = useLanguageStore()
   const { courseId = '' } = useParams<{ courseId: string }>()
 
   const [course, setCourse] = useState<GolfCourse | null>(null)
@@ -146,7 +149,7 @@ export function CourseMapUploadPage() {
     )
   }
 
-  const courseName = course ? (course.name_ko || course.name) : courseId
+  const courseName = course ? courseDisplayName(course, language) : courseId
   const hasMap = previewUrl !== null && !previewFailed
 
   return (

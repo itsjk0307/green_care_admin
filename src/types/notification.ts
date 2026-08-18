@@ -7,6 +7,7 @@ export type NotificationType =
   | 'ai_result_ready'
   | 'report_approved'
   | 'report_rejected'
+  | 'field_photo_upload'
   | string
 
 export type NotificationReferenceType =
@@ -14,6 +15,7 @@ export type NotificationReferenceType =
   | 'issue'
   | 'drone_scan'
   | 'work_report'
+  | 'field_photo'
   | string
 
 export type AppNotification = {

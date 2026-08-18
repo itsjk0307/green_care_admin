@@ -10,6 +10,8 @@ import { Button } from '../components/ui/Button'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { formatKoreanScanDate, todayLocalDate } from '../lib/formatScanDate'
 import { getPhotos, photoThumbnail } from '../services/photoService'
+import { courseDisplayName } from '../lib/courseName'
+import { useLanguageStore } from '../stores/languageStore'
 import type { PhotoFilters, PhotoTypeFilter, WorkPhoto } from '../types/photo'
 
 const COURSE_STORAGE_KEY = 'greencare-photobox-course-id'
@@ -71,6 +73,7 @@ function PhotoCard({ photo, onClick }: { photo: WorkPhoto; onClick: () => void }
 }
 
 export function PhotoBoxPage() {
+  const { language } = useLanguageStore()
   const photosRef = useRef<HTMLDivElement>(null)
   const [courseId, setCourseId] = useState(
     () => localStorage.getItem(COURSE_STORAGE_KEY) ?? '',
@@ -156,7 +159,7 @@ export function PhotoBoxPage() {
           >
             {courses.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name_ko || c.name}
+                {courseDisplayName(c, language)}
               </option>
             ))}
           </select>

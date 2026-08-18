@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import {
-  TASK_LABEL_BY_KEY,
-  ZONE_LABEL_BY_KEY,
+  taskLabel,
+  zoneLabel,
 } from '../../constants/dailyPlan'
 import { getPlanDetail, getPlanWorkers } from '../../services/dailyPlanService'
 import { fetchUsers } from '../../api/users'
+import { useLanguageStore } from '../../stores/languageStore'
 import { Badge } from '../ui/Badge'
 import { LoadingSpinner } from '../ui/LoadingSpinner'
 import { EmptyState } from '../ui/EmptyState'
@@ -44,13 +45,6 @@ function progressWidthClass(percent: number): string {
   return PROGRESS_WIDTH[rounded] ?? 'w-0'
 }
 
-function formatUpdatedAt(date: Date): string {
-  return date.toLocaleTimeString('ko-KR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
 function zoneBorderClass(status: DailyZoneTask['status']): string {
   if (status === 'done') return 'border-[#10B981]'
   if (status === 'in_progress')
@@ -66,12 +60,6 @@ function statusBadgeVariant(
   return 'pending'
 }
 
-function statusLabel(status: DailyZoneTask['status']): string {
-  if (status === 'done') return '완료'
-  if (status === 'in_progress') return '진행중'
-  return '대기'
-}
-
 function taskIcon(status: DailyZoneTask['status']): string {
   if (status === 'done') return '✅'
   if (status === 'in_progress') return '⏳'
@@ -79,6 +67,7 @@ function taskIcon(status: DailyZoneTask['status']): string {
 }
 
 export function PlanStatusBoard({ planId }: Props) {
+  const { t, language } = useLanguageStore()
   const [lastUpdated, setLastUpdated] = useState(new Date())
 
   const planQuery = useQuery({
@@ -115,47 +104,59 @@ export function PlanStatusBoard({ planId }: Props) {
   const progress = useMemo(() => {
     const tasks = planQuery.data?.zone_tasks ?? []
     if (tasks.length === 0) return 0
-    const done = tasks.filter((t) => t.status === 'done').length
+    const done = tasks.filter((task) => task.status === 'done').length
     return Math.round((done / tasks.length) * 100)
   }, [planQuery.data?.zone_tasks])
+
+  function formatUpdatedAt(date: Date): string {
+    return date.toLocaleTimeString(language === 'en' ? 'en-US' : 'ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  function statusLabel(status: DailyZoneTask['status']): string {
+    if (status === 'done') return t('statusDone')
+    if (status === 'in_progress') return t('statusInProgress')
+    return t('statusWaiting')
+  }
 
   if (!planId) {
     return (
       <EmptyState
         icon={<span className="text-4xl">📋</span>}
-        title="실시간 현황"
-        description="계획을 저장하거나 발행하면 현황이 표시됩니다."
+        title={t('liveStatus')}
+        description={t('liveStatusEmpty')}
       />
     )
   }
 
   if (planQuery.isLoading) {
-    return <LoadingSpinner message="현황 불러오는 중…" />
+    return <LoadingSpinner message={t('loadingStatus')} />
   }
 
   if (planQuery.isError || !planQuery.data) {
     return (
-      <p className="text-sm text-[#DC2626]">
-        현황을 불러오지 못했습니다.
-      </p>
+      <p className="text-sm text-[#DC2626]">{t('statusLoadFailed')}</p>
     )
   }
 
   const plan = planQuery.data
   const locations = locationsQuery.data ?? []
+  const locale = language === 'en' ? 'en-US' : 'ko-KR'
 
   return (
     <div className="flex h-full flex-col">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-bold text-[#111827]">실시간 현황</h2>
+        <h2 className="text-lg font-bold text-[#111827]">{t('liveStatus')}</h2>
         <span className="text-xs text-[#6B7280]">
-          🔄 방금 전 업데이트 · {formatUpdatedAt(lastUpdated)}
+          🔄 {t('updatedJustNow')} · {formatUpdatedAt(lastUpdated)}
         </span>
       </div>
 
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="font-bold text-[#374151]">전체 진행률</span>
+          <span className="font-bold text-[#374151]">{t('overallProgress')}</span>
           <span className="font-bold text-[#1B5E20]">{progress}%</span>
         </div>
         <div
@@ -174,7 +175,7 @@ export function PlanStatusBoard({ planId }: Props) {
       <div className="flex-1 space-y-3 overflow-y-auto pr-1">
         {plan.zone_tasks.length === 0 ? (
           <p className="rounded-xl border border-dashed border-[#E5E7EB] py-8 text-center text-sm text-[#6B7280]">
-            등록된 구역 작업이 없습니다
+            {t('noZoneTasks')}
           </p>
         ) : (
           plan.zone_tasks.map((task) => (
@@ -184,7 +185,7 @@ export function PlanStatusBoard({ planId }: Props) {
             >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <p className="font-bold text-[#111827]">
-                  {ZONE_LABEL_BY_KEY[task.zone] ?? task.zone}
+                  {zoneLabel(task.zone, language)}
                 </p>
                 <Badge variant={statusBadgeVariant(task.status)}>
                   {statusLabel(task.status)}
@@ -205,17 +206,18 @@ export function PlanStatusBoard({ planId }: Props) {
               ) : null}
 
               <ul className="space-y-1 text-sm text-[#374151]">
-                {task.task_types.map((t) => (
-                  <li key={t} className="flex items-center gap-2">
+                {task.task_types.map((taskType) => (
+                  <li key={taskType} className="flex items-center gap-2">
                     <span aria-hidden>{taskIcon(task.status)}</span>
-                    {TASK_LABEL_BY_KEY[t] ?? t}
+                    {taskLabel(taskType, language)}
                   </li>
                 ))}
               </ul>
 
               {task.status === 'done' && task.completed_at ? (
                 <p className="mt-2 text-xs text-[#6B7280]">
-                  완료: {new Date(task.completed_at).toLocaleString('ko-KR')}
+                  {t('completedAt')}:{' '}
+                  {new Date(task.completed_at).toLocaleString(locale)}
                 </p>
               ) : null}
             </article>
@@ -225,12 +227,12 @@ export function PlanStatusBoard({ planId }: Props) {
 
       <div className="mt-6 border-t border-[#F3F4F6] pt-4">
         <h3 className="mb-2 text-sm font-bold text-[#111827]">
-          작업자 위치
+          {t('workerLocations')}
         </h3>
         {locationsQuery.isLoading ? (
-          <p className="text-xs text-[#6B7280]">불러오는 중…</p>
+          <p className="text-xs text-[#6B7280]">{t('loadingEllipsis')}</p>
         ) : locations.length === 0 ? (
-          <p className="text-xs text-[#9CA3AF]">위치 정보 없음</p>
+          <p className="text-xs text-[#9CA3AF]">{t('noLocationInfo')}</p>
         ) : (
           <ul className="max-h-40 space-y-2 overflow-y-auto">
             {locations.map((loc) => (
@@ -243,7 +245,7 @@ export function PlanStatusBoard({ planId }: Props) {
                 </span>
                 <span className="text-xs text-[#6B7280]">
                   {loc.zone_label ??
-                    ZONE_LABEL_BY_KEY[loc.zone ?? ''] ??
+                    (loc.zone ? zoneLabel(loc.zone, language) : null) ??
                     loc.zone ??
                     '—'}
                   {loc.status ? ` · ${loc.status}` : ''}

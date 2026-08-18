@@ -9,6 +9,7 @@ export const NOTIFICATION_DOT_COLORS: Record<string, string> = {
   ai_result_ready: 'bg-[#8B5CF6]',
   report_approved: 'bg-[#10B981]',
   report_rejected: 'bg-[#EF4444]',
+  field_photo_upload: 'bg-[#10B981]',
 }
 
 export function notificationDotColor(type: NotificationType): string {
@@ -26,7 +27,9 @@ export function notificationTargetPath(
     case 'drone_scan':
       return '/drone-scans'
     case 'work_report':
-      return '/work-reports'
+      return '/daily-plans'
+    case 'field_photo':
+      return '/course-map'
     default:
       return null
   }

@@ -7,10 +7,13 @@ import { ScanList } from '../components/drone/ScanList'
 import { UploadScanModal } from '../components/drone/UploadScanModal'
 import { Button } from '../components/ui/Button'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
+import { courseDisplayName } from '../lib/courseName'
+import { useLanguageStore } from '../stores/languageStore'
 
 const COURSE_STORAGE_KEY = 'greencare-drone-scan-course-id'
 
 export function DroneScanPage() {
+  const { language } = useLanguageStore()
   const [courseId, setCourseId] = useState(
     () => localStorage.getItem(COURSE_STORAGE_KEY) ?? '',
   )
@@ -53,7 +56,7 @@ export function DroneScanPage() {
       >
         {courses.map((c) => (
           <option key={c.id} value={c.id}>
-            {c.name_ko || c.name}
+            {courseDisplayName(c, language)}
           </option>
         ))}
       </select>

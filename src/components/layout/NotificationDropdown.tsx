@@ -23,13 +23,14 @@ export function NotificationDropdown({ onClose }: Props) {
   const notificationsQuery = useQuery({
     queryKey: ['notifications'],
     queryFn: () => getNotifications(1),
+    refetchInterval: 15_000,
   })
 
   const markAllMutation = useMutation({
     mutationFn: markAllAsRead,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['notifications'] })
-      void queryClient.invalidateQueries({ queryKey: ['unread-count'] })
+      void queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] })
       void queryClient.invalidateQueries({ queryKey: ['notifications-infinite'] })
     },
   })
@@ -38,7 +39,7 @@ export function NotificationDropdown({ onClose }: Props) {
     mutationFn: deleteNotification,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['notifications'] })
-      void queryClient.invalidateQueries({ queryKey: ['unread-count'] })
+      void queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] })
       void queryClient.invalidateQueries({ queryKey: ['notifications-infinite'] })
     },
   })
@@ -93,7 +94,7 @@ export function NotificationDropdown({ onClose }: Props) {
         <Link
           to="/notifications"
           onClick={onClose}
-          className="text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700"
+          className="text-sm font-medium text-[#121820] transition-colors hover:text-[#1c2630]"
         >
           모든 알림 보기
         </Link>

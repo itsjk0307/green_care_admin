@@ -10,10 +10,10 @@ export function NotificationBell() {
   const queryClient = useQueryClient()
 
   const unreadQuery = useQuery({
-    queryKey: ['unread-count'],
+    queryKey: ['notifications', 'unread-count'],
     queryFn: getUnreadCount,
-    refetchInterval: 60_000,
-    staleTime: 30_000,
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: true,
   })
 
   const count = unreadQuery.data?.count ?? 0
@@ -45,13 +45,17 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={toggleOpen}
-        className="relative rounded-lg p-2 text-slate-400 transition-all duration-150 hover:bg-slate-100 hover:text-slate-700"
+        className={`relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-150 ${
+          isOpen
+            ? 'bg-[#121820] text-white shadow-[0_4px_12px_rgba(18,24,32,0.25)]'
+            : 'text-slate-400 hover:bg-[#f0f4f1] hover:text-slate-700'
+        }`}
         aria-label="알림"
         aria-expanded={isOpen}
       >
         <BellIcon className="h-5 w-5" />
         {count > 0 ? (
-          <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#ef4444] px-1 text-[10px] font-bold leading-none text-white shadow-[0_2px_6px_rgba(239,68,68,0.45)]">
             {badgeLabel}
           </span>
         ) : null}

@@ -8,12 +8,20 @@ export type GolfCourse = {
   id: string
   name: string
   name_ko: string
+  name_en?: string | null
   address: string
   address_ko: string
   total_area_sqm: number | null
   map_image_path: string | null
   is_active: boolean
   created_at: string
+  center_lat: number | null
+  center_lng: number | null
+  default_zoom: number | null
+  bound_north: number | null
+  bound_south: number | null
+  bound_east: number | null
+  bound_west: number | null
 }
 
 export type AppUser = {

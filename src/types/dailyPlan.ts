@@ -8,6 +8,15 @@ export type CreatePlanBody = {
   temperature_max?: number | null
   rainfall_mm?: number | null
   special_notes?: string | null
+  total_workers?: number | null
+}
+
+export type UpdatePlanBody = {
+  weather?: string
+  temperature_min?: number | null
+  temperature_max?: number | null
+  rainfall_mm?: number | null
+  special_notes?: string | null
 }
 
 export type AddZoneTaskBody = {
@@ -21,6 +30,10 @@ export type AddZoneTaskBody = {
 export type UpdateZoneTaskBody = {
   status?: 'pending' | 'in_progress' | 'done'
   completed_at?: string | null
+  task_types?: string[]
+  mowing_height_mm?: number | null
+  assigned_worker_ids?: string[]
+  notes?: string | null
 }
 
 export type AttendanceItem = {

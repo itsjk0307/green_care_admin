@@ -12,13 +12,49 @@ export class ApiError extends Error {
   }
 }
 
+const USER_STORAGE_KEY = 'greencare-admin-user'
+
+let redirectingToLogin = false
+
+function handleUnauthorized(message: string) {
+  if (redirectingToLogin) return
+  redirectingToLogin = true
+
+  localStorage.removeItem(TOKEN_STORAGE_KEY)
+  localStorage.removeItem(USER_STORAGE_KEY)
+  useAuthStore.getState().clearAuth()
+
+  devTerminalLog('warn', 'Session expired — redirecting to login', { message })
+
+  const loginPath = '/login'
+  if (!window.location.pathname.startsWith(loginPath)) {
+    window.location.assign(loginPath)
+  } else {
+    redirectingToLogin = false
+  }
+}
+
+function extractErrorMessage(
+  payload: ApiResponse<unknown> | null,
+  status: number,
+): string {
+  if (payload?.message) return payload.message
+  if (typeof payload === 'object' && payload !== null && 'detail' in payload) {
+    return String((payload as { detail: unknown }).detail)
+  }
+  return `Request failed (${status})`
+}
+
 export async function apiRequest<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
+  // Prefer localStorage so the token is available immediately after AuthContext
+  // persists a successful login, even before setAccessToken propagates.
   const token =
-    useAuthStore.getState().accessToken ??
-    localStorage.getItem(TOKEN_STORAGE_KEY)
+    localStorage.getItem(TOKEN_STORAGE_KEY) ??
+    useAuthStore.getState().accessToken
+
   const headers = new Headers(options.headers)
 
   if (!headers.has('Content-Type') && options.body && !(options.body instanceof FormData)) {
@@ -49,14 +85,13 @@ export async function apiRequest<T>(
   const payload = (await response.json().catch(() => null)) as ApiResponse<T> | null
 
   if (!response.ok) {
+    const message = extractErrorMessage(payload, response.status)
     devTerminalLog('error', `API HTTP ${response.status} — ${method} ${url}`, {
-      message: payload?.message,
+      message,
     })
-    const message =
-      payload?.message ??
-      (typeof payload === 'object' && payload !== null && 'detail' in payload
-        ? String((payload as { detail: unknown }).detail)
-        : `Request failed (${response.status})`)
+    if (response.status === 401) {
+      handleUnauthorized(message)
+    }
     throw new ApiError(message, response.status)
   }
 
@@ -79,8 +114,9 @@ export async function apiBlobRequest(
   options: RequestInit = {},
 ): Promise<Blob> {
   const token =
-    useAuthStore.getState().accessToken ??
-    localStorage.getItem(TOKEN_STORAGE_KEY)
+    localStorage.getItem(TOKEN_STORAGE_KEY) ??
+    useAuthStore.getState().accessToken
+
   const headers = new Headers(options.headers)
   if (token) {
     headers.set('Authorization', `Bearer ${token}`)
@@ -91,10 +127,12 @@ export async function apiBlobRequest(
 
   if (!response.ok) {
     const payload = (await response.json().catch(() => null)) as ApiResponse<unknown> | null
-    throw new ApiError(
-      payload?.message ?? `Download failed (${response.status})`,
-      response.status,
-    )
+    const message =
+      payload?.message ?? `Download failed (${response.status})`
+    if (response.status === 401) {
+      handleUnauthorized(message)
+    }
+    throw new ApiError(message, response.status)
   }
 
   return response.blob()

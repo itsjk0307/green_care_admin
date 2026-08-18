@@ -84,6 +84,10 @@ export default defineConfig(({ mode }) => {
           target: apiProxyTarget,
           changeOrigin: true,
         },
+        '/tiles': {
+          target: apiProxyTarget,
+          changeOrigin: true,
+        },
       },
     },
   }

@@ -12,6 +12,8 @@ import { Button } from '../components/ui/Button'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { ISSUE_TYPES } from '../lib/issueUi'
 import { getIssues } from '../services/issueService'
+import { courseDisplayName } from '../lib/courseName'
+import { useLanguageStore } from '../stores/languageStore'
 import type { IssueFilters, IssueStatus, IssueType, PinPosition } from '../types/issue'
 
 const COURSE_STORAGE_KEY = 'greencare-issues-course-id'
@@ -19,6 +21,7 @@ const COURSE_STORAGE_KEY = 'greencare-issues-course-id'
 type ListStatusFilter = IssueStatus | 'all'
 
 export function IssuesPage() {
+  const { language } = useLanguageStore()
   const queryClient = useQueryClient()
   const [courseId, setCourseId] = useState(
     () => localStorage.getItem(COURSE_STORAGE_KEY) ?? '',
@@ -105,7 +108,7 @@ export function IssuesPage() {
         >
           {courses.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.name_ko || c.name}
+              {courseDisplayName(c, language)}
             </option>
           ))}
         </select>

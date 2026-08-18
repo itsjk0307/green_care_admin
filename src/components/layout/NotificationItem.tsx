@@ -56,10 +56,10 @@ export function NotificationItem({
       tabIndex={0}
       onClick={handleNavigate}
       onKeyDown={handleKeyDown}
-      className={`group flex cursor-pointer gap-3 px-4 py-3 transition hover:bg-[#F9FAFB] ${
+      className={`group flex cursor-pointer gap-3 px-4 py-3 transition hover:bg-[#f4f5f7] ${
         notification.is_read
           ? 'border-l-4 border-transparent bg-white'
-          : 'border-l-4 border-[#60A5FA] bg-[#EFF6FF]'
+          : 'border-l-4 border-[#121820] bg-[#f4f5f7]'
       }`}
     >
       <span
@@ -86,7 +86,7 @@ export function NotificationItem({
       <div className="flex shrink-0 flex-col items-end gap-2">
         {!notification.is_read ? (
           <span
-            className="mt-1 h-2 w-2 rounded-full bg-[#10B981]"
+            className="mt-1 h-2 w-2 rounded-full bg-[#121820]"
             aria-label="읽지 않음"
           />
         ) : (

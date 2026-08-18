@@ -53,7 +53,7 @@ export function markAsRead(notificationId: string) {
 
 export function markAllAsRead() {
   return apiRequest<void>('/notifications/read-all', {
-    method: 'PATCH',
+    method: 'POST',
   })
 }
 
