@@ -4,7 +4,6 @@
  */
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
-import L from 'leaflet'
 import type { Map as LeafletMap } from 'leaflet'
 import { TASK_TYPES, type TaskKey } from '../constants/dailyPlan'
 import { translations } from '../i18n/translations'

@@ -96,12 +96,10 @@ function MapController({
   showDroneTiles,
   paddedMaxBounds,
   courseBoundBox,
-  courseCenter,
 }: {
   showDroneTiles: boolean
   paddedMaxBounds: [[number, number], [number, number]] | undefined
   courseBoundBox: [[number, number], [number, number]] | null
-  courseCenter: [number, number] | null
 }) {
   const map = useMap()
   useEffect(() => {
@@ -696,11 +694,6 @@ export function CourseMapPage() {
               showDroneTiles={showDroneTiles}
               paddedMaxBounds={paddedMaxBounds}
               courseBoundBox={courseBoundBox}
-              courseCenter={
-                selectedCourse?.center_lat != null && selectedCourse?.center_lng != null
-                  ? [selectedCourse.center_lat, selectedCourse.center_lng]
-                  : null
-              }
             />
 
             {!showDroneTiles && courseBoundBox && <FitBounds bounds={courseBoundBox} />}

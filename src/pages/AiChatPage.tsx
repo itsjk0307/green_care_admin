@@ -255,7 +255,7 @@ export function AiChatPage() {
 
   const [chats, setChats] = useState<ChatThread[]>([])
   const [activeChatId, setActiveChatId] = useState('')
-  const [loadingChats, setLoadingChats] = useState(true)
+  const [, setLoadingChats] = useState(true)
   const [historyOpen, setHistoryOpen] = useState(() => !isNarrow)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)

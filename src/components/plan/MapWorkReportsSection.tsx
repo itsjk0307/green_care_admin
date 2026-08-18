@@ -12,11 +12,7 @@ import toast from 'react-hot-toast'
 import { fetchCourses } from '../../api/courses'
 import { taskLabel } from '../../constants/dailyPlan'
 import { courseDisplayName } from '../../lib/courseName'
-import {
-  buildMapPdfLabels,
-  buildMapWorkPdf,
-  mapWorkPdfFilename,
-} from '../../lib/mapWorkPdf'
+import { buildMapPdfLabels, buildMapWorkPdf } from '../../lib/mapWorkPdf'
 import { resolveMapReportFileUrl } from '../../services/mapReportService'
 import { useLanguageStore } from '../../stores/languageStore'
 import {
@@ -26,7 +22,11 @@ import {
   saveMapPdf,
   useMapReportStore,
 } from '../../stores/mapReportStore'
-import { isMapReportUnsynced, type MapWorkReport } from '../../types/mapReport'
+import {
+  isMapReportUnsynced,
+  type MapReportMark,
+  type MapWorkReport,
+} from '../../types/mapReport'
 import { Button } from '../ui/Button'
 
 function formatWorkDate(dateStr: string, language: string): string {
@@ -230,8 +230,6 @@ export function MapWorkReportsSection({
   }
 
   async function handleOpenPdf(report: MapWorkReport) {
-    const filename = mapWorkPdfFilename(report.courseName, report.workDate)
-
     // Instant path: already in memory
     const hot = peekCachedPdfUrl(report.id)
     if (hot) {
